@@ -8,7 +8,39 @@ st.set_page_config(
     page_icon="🏥",
     layout="wide"
 )
+# Initialize session state for login status if it doesn't exist
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
 
+# Function to handle login verification
+def login_screen():
+    st.title("🏥 Hospital Portal - Login")
+    st.markdown("Please enter your credentials to access the system.")
+    
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+    
+    if st.button("Login"):
+        # You can change these to your preferred username and password
+        if username == "admin" and password == "1234":
+            st.session_state.logged_in = True
+            st.rerun()
+        else:
+            st.error("Invalid username or password")
+
+# Check if user is logged in
+if not st.session_state.logged_in:
+    login_screen()
+else:
+    # --- PUT YOUR MAIN HOSPITAL PORTAL CODE HERE ---
+    st.sidebar.title("Hospital Portal")
+    if st.sidebar.button("Log out"):
+        st.session_state.logged_in = False
+        st.rerun()
+
+    # Your existing dashboard code starts here
+    st.write("Welcome to the Hospital Management System...")
+    # ... rest of your code ...
 # Initialize Session State
 if 'patients' not in st.session_state:
     st.session_state.patients = []
