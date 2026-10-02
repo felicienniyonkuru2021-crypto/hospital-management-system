@@ -51,7 +51,7 @@ def login_screen():
         password = st.text_input("Password", type="password")
         
         if st.button("Login", use_container_width=True):
-            if username == "admin" and password == "1234":
+            if username == "admin" and password == "FEYILIO":
                 st.session_state.logged_in = True
                 st.rerun()
             else:
