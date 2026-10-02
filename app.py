@@ -9,6 +9,22 @@ st.set_page_config(
     layout="wide"
 )
 
+# --- CUSTOM CSS TO CHANGE BACKGROUND TO GREEN ---
+st.markdown("""
+    <style>
+    /* Main background color */
+    .stApp {
+        background-color: #0e3b2e; /* A nice dark hospital green */
+        color: white;
+    }
+    
+    /* Sidebar background color */
+    [data-testid="stSidebar"] {
+        background-color: #07261d;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 # Initialize session state for login status if it doesn't exist
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
