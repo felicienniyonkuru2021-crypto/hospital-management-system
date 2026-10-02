@@ -44,7 +44,7 @@ def login_screen():
     
     with col2:
         st.markdown("<br><br>", unsafe_allow_html=True) # Optional spacing from top
-        st.title("Ambulance: "🏥" Hospital Portal - Login")
+        st.title(" Hospital Portal - Login")
         st.markdown("Please enter your credentials to access the system.")
         
         username = st.text_input("Username")
