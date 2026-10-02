@@ -5,7 +5,7 @@ from datetime import datetime
 # Page Configuration
 st.set_page_config(
     page_title="Hospital Management System",
-    page_icon="🚑",
+    page_icon="💊",
     layout="wide"
 )
 
@@ -44,7 +44,7 @@ def login_screen():
     
     with col2:
         st.markdown("<br><br>", unsafe_allow_html=True) # Optional spacing from top
-        st.title("Ambulance: "🚑" Hospital Portal - Login")
+        st.title("Ambulance: "💊" Hospital Portal - Login")
         st.markdown("Please enter your credentials to access the system.")
         
         username = st.text_input("Username")
