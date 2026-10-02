@@ -5,7 +5,7 @@ from datetime import datetime
 # Page Configuration
 st.set_page_config(
     page_title="Hospital Management System",
-    page_icon="🏥",
+    page_icon="🚑",
     layout="wide"
 )
 
@@ -44,7 +44,7 @@ def login_screen():
     
     with col2:
         st.markdown("<br><br>", unsafe_allow_html=True) # Optional spacing from top
-        st.title("🏥 Hospital Portal - Login")
+        st.title("Ambulance: "🚑" Hospital Portal - Login")
         st.markdown("Please enter your credentials to access the system.")
         
         username = st.text_input("Username")
@@ -94,7 +94,7 @@ else:
 
         with st.form("patient_form"):
             name = st.text_input("Full Name")
-            age = st.number_input("Age", min_value=0, max_value=120, value=25)
+            age = st.number_input("Age", min_value=0, max_value=120, value=20)
             gender = st.selectbox("Gender", ["Male", "Female", "Other"])
             phone = st.text_input("Phone Number")
             address = st.text_area("Address")
@@ -131,7 +131,7 @@ else:
             with st.form("appointment_form"):
                 selected_patient = st.selectbox("Select Patient", patient_names)
                 doctor = st.selectbox("Assign Doctor",
-                                     ["Dr. Smith (Cardiology)", "Dr. Jones (Pediatrics)", "Dr. Alice (General Medicine)"])
+                                     ["Dr. liam (Cardiology)", "Dr. liora (Pediatrics)", "Dr. kimwaga (General Medicine)"])
                 date = st.date_input("Appointment Date", datetime.today())
                 time = st.time_input("Appointment Time")
                 submit_appt = st.form_submit_button("Book Appointment")
