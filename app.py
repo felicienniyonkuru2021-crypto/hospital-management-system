@@ -9,12 +9,12 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- CUSTOM CSS TO CHANGE BACKGROUND TO GREEN ---
+# --- CUSTOM CSS FOR GREEN BACKGROUND & CENTERED LOGIN ---
 st.markdown("""
     <style>
     /* Main background color */
     .stApp {
-        background-color: #0e3b2e; /* A nice dark hospital green */
+        background-color: #0e3b2e;
         color: white;
     }
     
@@ -37,20 +37,25 @@ if 'appointments' not in st.session_state:
 if 'bills' not in st.session_state:
     st.session_state.bills = []
 
-# Function to handle login verification
+# Function to handle login verification (Centered & Smaller Box)
 def login_screen():
-    st.title("🏥 Hospital Portal - Login")
-    st.markdown("Please enter your credentials to access the system.")
+    # Create empty columns on the left and right to center the middle column
+    col1, col2, col3 = st.columns([1, 1.5, 1])
     
-    username = st.text_input("Username")
-    password = st.text_input("Password", type="password")
-    
-    if st.button("Login"):
-        if username == "admin" and password == "1234":
-            st.session_state.logged_in = True
-            st.rerun()
-        else:
-            st.error("Invalid username or password")
+    with col2:
+        st.markdown("<br><br>", unsafe_allow_html=True) # Optional spacing from top
+        st.title("🏥 Hospital Portal - Login")
+        st.markdown("Please enter your credentials to access the system.")
+        
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")
+        
+        if st.button("Login", use_container_width=True):
+            if username == "admin" and password == "1234":
+                st.session_state.logged_in = True
+                st.rerun()
+            else:
+                st.error("Invalid username or password")
 
 # Check if user is logged in
 if not st.session_state.logged_in:
