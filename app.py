@@ -63,9 +63,7 @@ class HospitalManagementSystem(tk.Tk):
         ).pack(anchor="w", pady=(0, 5))
         self.entry_user = tk.Entry(login_frame, font=("Arial", 11), width=28)
         self.entry_user.pack(pady=(0, 15))
-        self.entry_user.insert(
-            0, "doctor"
-        )  # Default placeholder set to doctor
+        self.entry_user.insert(0, "doctor")
 
         tk.Label(
             login_frame,
@@ -78,9 +76,7 @@ class HospitalManagementSystem(tk.Tk):
             login_frame, font=("Arial", 11), width=28, show="*"
         )
         self.entry_pass.pack(pady=(0, 15))
-        self.entry_pass.insert(
-            0, "doc123"
-        )  # Default placeholder set to doctor password
+        self.entry_pass.insert(0, "doc123")
 
         btn_login = tk.Button(
             login_frame,
