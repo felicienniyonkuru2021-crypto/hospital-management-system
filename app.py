@@ -161,7 +161,7 @@ else:
                 c1, c2 = st.columns(2)
                 with c1:
                     f_name = st.text_input("First Name")
-                    age = st.number_input("Age", min_value=0, max_value=120, value=25)
+                    age = st.number_input("Age", min_value=0, max_value=130, value=23)
                 with c2:
                     l_name = st.text_input("Last Name")
                     gender = st.selectbox("Gender", ["Male", "Female", "Other"])
