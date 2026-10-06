@@ -5,6 +5,24 @@ st.set_page_config(
     page_title="Hospital Management System - Portal", page_icon="🏥", layout="centered"
 )
 
+# Custom CSS to force a clean white background and dark text
+st.markdown(
+    """
+    <style>
+    .stApp {
+        background-color: #ffffff;
+        color: #2c3e50;
+    }
+    /* Style inputs and text for visibility on white background */
+    .stTextInput label {
+        color: #2c3e50 !important;
+        font-weight: bold;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 # Initialize session state variables for login and navigation tracking
 if "logged_in" not in st.session_state:
   st.session_state.logged_in = False
