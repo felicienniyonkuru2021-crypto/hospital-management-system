@@ -1,8 +1,8 @@
 import streamlit as st
 
-# Configure page settings
+# Configure page settings (page icon removed)
 st.set_page_config(
-    page_title="Hospital Management System - Portal", page_icon="🏥", layout="centered"
+    page_title="Hospital Management System - Portal", layout="centered"
 )
 
 # Custom CSS to force clean white background, dark text, blue buttons, and green Log Out button
@@ -57,11 +57,11 @@ if "name" not in st.session_state:
 if "current_module" not in st.session_state:
     st.session_state.current_module = "dashboard"
 
-# Persistent database data across navigation (including address)
+# Persistent database data across navigation (including Patient ID and address)
 if "patients" not in st.session_state:
     st.session_state.patients = [
-        {"id": 1, "name": "Alice Uwase", "age": 28, "gender": "Female", "phone": "0781234567", "address": "Kigali"},
-        {"id": 2, "name": "Jean Bosco", "age": 42, "gender": "Male", "phone": "0729876543", "address": "Butare"}
+        {"id": "PAT-001", "name": "Alice Uwase", "age": 28, "gender": "Female", "phone": "0781234567", "address": "Kigali"},
+        {"id": "PAT-002", "name": "Jean Bosco", "age": 42, "gender": "Male", "phone": "0729876543", "address": "Butare"}
     ]
 if "appointments" not in st.session_state:
     st.session_state.appointments = [
@@ -158,6 +158,7 @@ else:
             st.write("Add and manage patient records in the system.")
 
             with st.form("reg_form"):
+                patient_id = st.text_input("Patient ID", value=f"PAT-{len(st.session_state.patients)+1:03d}")
                 c1, c2 = st.columns(2)
                 with c1:
                     f_name = st.text_input("First Name")
@@ -171,20 +172,19 @@ else:
                 
                 submitted = st.form_submit_button("Register Patient")
                 if submitted:
-                    if f_name and l_name and phone and address:
+                    if patient_id and f_name and l_name and phone and address:
                         full_name = f"{f_name} {l_name}"
-                        new_id = len(st.session_state.patients) + 1
                         st.session_state.patients.append({
-                            "id": new_id, 
+                            "id": patient_id, 
                             "name": full_name, 
                             "age": age, 
                             "gender": gender, 
                             "phone": phone,
                             "address": address
                         })
-                        st.success(f"Patient {full_name} registered successfully!")
+                        st.success(f"Patient {full_name} (ID: {patient_id}) registered successfully!")
                     else:
-                        st.error("Please fill in First Name, Last Name, Phone Number, and Address.")
+                        st.error("Please fill in Patient ID, First Name, Last Name, Phone Number, and Address.")
 
             st.markdown("### 📋 Registered Patients Directory")
             if st.session_state.patients:
@@ -267,15 +267,4 @@ else:
                         st.session_state.bills.append({
                             "patient": b_patient,
                             "service": service,
-                            "amount": amount,
-                            "status": status
-                        })
-                        st.success(f"Bill for {b_patient} amounting to {amount:,} RWF added successfully!")
-
-            st.markdown("### 📋 Financial Records & Invoices")
-            if st.session_state.bills:
-                st.dataframe(st.session_state.bills, use_container_width=True)
-            else:
-                st.info("No billing records found.")
-
-    st.markdown("<br><br><p style='text-align: center; color: #95a5a6; font-style: italic;'>FEYI GROUP LTD</p>", unsafe_allow_html=True)
+                            "
