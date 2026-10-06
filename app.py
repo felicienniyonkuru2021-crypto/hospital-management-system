@@ -57,11 +57,11 @@ if "name" not in st.session_state:
 if "current_module" not in st.session_state:
     st.session_state.current_module = "dashboard"
 
-# Persistent database data across navigation
+# Persistent database data across navigation (including address)
 if "patients" not in st.session_state:
     st.session_state.patients = [
-        {"id": 1, "name": "Alice Uwase", "age": 28, "gender": "Female", "phone": "0781234567"},
-        {"id": 2, "name": "Jean Bosco", "age": 42, "gender": "Male", "phone": "0729876543"}
+        {"id": 1, "name": "Alice Uwase", "age": 28, "gender": "Female", "phone": "0781234567", "address": "Kigali"},
+        {"id": 2, "name": "Jean Bosco", "age": 42, "gender": "Male", "phone": "0729876543", "address": "Butare"}
     ]
 if "appointments" not in st.session_state:
     st.session_state.appointments = [
@@ -165,19 +165,26 @@ else:
                 with c2:
                     l_name = st.text_input("Last Name")
                     gender = st.selectbox("Gender", ["Male", "Female", "Other"])
+                
                 phone = st.text_input("Phone Number")
+                address = st.text_input("Residential Address")
                 
                 submitted = st.form_submit_button("Register Patient")
                 if submitted:
-                    if f_name and l_name and phone:
+                    if f_name and l_name and phone and address:
                         full_name = f"{f_name} {l_name}"
                         new_id = len(st.session_state.patients) + 1
                         st.session_state.patients.append({
-                            "id": new_id, "name": full_name, "age": age, "gender": gender, "phone": phone
+                            "id": new_id, 
+                            "name": full_name, 
+                            "age": age, 
+                            "gender": gender, 
+                            "phone": phone,
+                            "address": address
                         })
                         st.success(f"Patient {full_name} registered successfully!")
                     else:
-                        st.error("Please fill in First Name, Last Name, and Phone.")
+                        st.error("Please fill in First Name, Last Name, Phone Number, and Address.")
 
             st.markdown("### 📋 Registered Patients Directory")
             if st.session_state.patients:
