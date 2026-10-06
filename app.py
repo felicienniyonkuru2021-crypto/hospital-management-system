@@ -5,7 +5,7 @@ st.set_page_config(
     page_title="Hospital Management System - Portal", page_icon="🏥", layout="centered"
 )
 
-# Custom CSS to force a clean white background, dark text, and blue buttons
+# Custom CSS to force clean white background, dark text, and blue buttons/inputs
 st.markdown(
     """
     <style>
@@ -17,16 +17,23 @@ st.markdown(
         color: #2c3e50 !important;
         font-weight: bold;
     }
-    div.stButton > button {
+    /* Style all buttons (regular and form submit buttons) to be blue with white text */
+    div.stButton > button, div.stFormSubmitButton > button {
         background-color: #3498db !important;
         color: white !important;
         border: none !important;
         font-weight: bold !important;
         border-radius: 5px !important;
     }
-    div.stButton > button:hover {
+    div.stButton > button:hover, div.stFormSubmitButton > button:hover {
         background-color: #2980b9 !important;
         color: white !important;
+    }
+    /* Force light background and blue border for input fields */
+    input, textarea, select {
+        background-color: #f8f9fa !important;
+        color: #2c3e50 !important;
+        border: 1px solid #3498db !important;
     }
     </style>
     """,
@@ -132,7 +139,7 @@ else:
                 st.rerun()
 
     else:
-        if st.button("⬅️️ Back to Main Menu"):
+        if st.button("⬅ Back to Main Menu"):
             st.session_state.current_module = "dashboard"
             st.rerun()
 
