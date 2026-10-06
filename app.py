@@ -5,7 +5,7 @@ st.set_page_config(
     page_title="Hospital Management System - Portal", page_icon="🏥", layout="centered"
 )
 
-# Custom CSS to force a clean white background and dark text
+# Custom CSS to force a clean white background, dark text, and blue buttons
 st.markdown(
     """
     <style>
@@ -17,6 +17,18 @@ st.markdown(
     .stTextInput label {
         color: #2c3e50 !important;
         font-weight: bold;
+    }
+    /* Style Streamlit primary/standard buttons to be blue with white text */
+    div.stButton > button {
+        background-color: #3498db !important;
+        color: white !important;
+        border: none !important;
+        font-weight: bold !important;
+        border-radius: 5px !important;
+    }
+    div.stButton > button:hover {
+        background-color: #2980b9 !important;
+        color: white !important;
     }
     </style>
     """,
