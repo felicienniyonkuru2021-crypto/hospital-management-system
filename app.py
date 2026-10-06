@@ -1,248 +1,260 @@
-import subprocess
-import sys
-import tkinter as tk
-from tkinter import messagebox, ttk
+import streamlit as st
 
+# Configure page settings
+st.set_page_config(
+    page_title="Hospital Management System - Portal", page_icon="🏥", layout="centered"
+)
 
-class HospitalManagementSystem(tk.Tk):
+# Custom CSS to force a clean white background, dark text, and blue buttons
+st.markdown(
+    """
+    <style>
+    .stApp {
+        background-color: #ffffff;
+        color: #2c3e50;
+    }
+    .stTextInput label, .stSelectbox label, .stNumberInput label, .stDateInput label, .stTimeInput label, .stTextArea label {
+        color: #2c3e50 !important;
+        font-weight: bold;
+    }
+    div.stButton > button {
+        background-color: #3498db !important;
+        color: white !important;
+        border: none !important;
+        font-weight: bold !important;
+        border-radius: 5px !important;
+    }
+    div.stButton > button:hover {
+        background-color: #2980b9 !important;
+        color: white !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
-    def __init__(self):
-        super().__init__()
-        self.title("Hospital Management System - Portal")
-        self.geometry("500x550")
-        self.config(bg="#f4f6f9")
+# Initialize session state variables for login and navigation tracking
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+if "username" not in st.session_state:
+    st.session_state.username = ""
+if "name" not in st.session_state:
+    st.session_state.name = ""
+if "current_module" not in st.session_state:
+    st.session_state.current_module = "dashboard"
 
-        # User database including doctor credentials
-        self.users = {
-            "admin": {"password": "pass123", "name": "Hospital Admin"},
-            "doctor": {"password": "doc123", "name": "Dr. Smith"},
-            "reception": {"password": "rec123", "name": "Front Desk"},
-        }
+# Persistent database data across navigation
+if "patients" not in st.session_state:
+    st.session_state.patients = [
+        {"id": 1, "name": "Alice Uwase", "age": 28, "gender": "Female", "phone": "0781234567"},
+        {"id": 2, "name": "Jean Bosco", "age": 42, "gender": "Male", "phone": "0729876543"}
+    ]
+if "appointments" not in st.session_state:
+    st.session_state.appointments = [
+        {"patient": "Alice Uwase", "doctor": "Dr. Smith", "date": "2026-10-07", "time": "09:00 AM", "status": "Confirmed"}
+    ]
+if "bills" not in st.session_state:
+    st.session_state.bills = [
+        {"patient": "Alice Uwase", "service": "Consultation", "amount": 15000, "status": "Paid"}
+    ]
 
-        self.container = tk.Frame(self, bg="#f4f6f9")
-        self.container.pack(fill="both", expand=True)
+# User database including credentials
+users = {
+    "admin": {"password": "pass123", "name": "Hospital Admin"},
+    "doctor": {"password": "doc123", "name": "Dr. Smith"},
+    "reception": {"password": "rec123", "name": "Front Desk"},
+}
 
-        self.show_login_screen()
+def handle_login():
+    username = st.session_state.input_user.strip().lower()
+    password = st.session_state.input_pass.strip()
 
-    def clear_container(self):
-        for widget in self.container.winfo_children():
-            widget.destroy()
+    if username in users and users[username]["password"] == password:
+        st.session_state.logged_in = True
+        st.session_state.username = username
+        st.session_state.name = users[username]["name"]
+        st.session_state.current_module = "dashboard"
+    else:
+        st.error("Invalid username or password. Please try again.")
 
-    def show_login_screen(self):
-        self.clear_container()
+def logout():
+    st.session_state.logged_in = False
+    st.session_state.username = ""
+    st.session_state.name = ""
+    st.session_state.current_module = "dashboard"
 
-        title_label = tk.Label(
-            self.container,
-            text="Hospital Management System",
-            font=("Arial", 20, "bold"),
-            bg="#f4f6f9",
-            fg="#2c3e50",
-        )
-        title_label.pack(pady=(40, 10))
+# ---------------- LOGIN SCREEN ----------------
+if not st.session_state.logged_in:
+    st.markdown("<h1 style='text-align: center; color: #2c3e50;'>Hospital Management System</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #7f8c8d;'>Please log in to your account</p>", unsafe_allow_html=True)
 
-        subtitle_label = tk.Label(
-            self.container,
-            text="Please log in to your account",
-            font=("Arial", 11),
-            bg="#f4f6f9",
-            fg="#7f8c8d",
-        )
-        subtitle_label.pack(pady=(0, 20))
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.text_input("Username:", value="doctor", key="input_user")
+        st.text_input("Password:", type="password", value="doc123", key="input_pass")
 
-        login_frame = tk.Frame(
-            self.container, bg="#ffffff", padx=30, pady=30, relief="raised", bd=1
-        )
-        login_frame.pack(padx=40, pady=10, fill="x")
+        if st.button("Login", use_container_width=True):
+            handle_login()
 
-        tk.Label(
-            login_frame,
-            text="Username:",
-            font=("Arial", 10, "bold"),
-            bg="#ffffff",
-            fg="#2c3e50",
-        ).pack(anchor="w", pady=(0, 5))
-        self.entry_user = tk.Entry(login_frame, font=("Arial", 11), width=28)
-        self.entry_user.pack(pady=(0, 15))
-        self.entry_user.insert(0, "doctor")
+        if st.button("Forgotten Password?", use_container_width=True):
+            st.info("Password reset instructions have been sent to your registered email address.")
 
-        tk.Label(
-            login_frame,
-            text="Password:",
-            font=("Arial", 10, "bold"),
-            bg="#ffffff",
-            fg="#2c3e50",
-        ).pack(anchor="w", pady=(0, 5))
-        self.entry_pass = tk.Entry(
-            login_frame, font=("Arial", 11), width=28, show="*"
-        )
-        self.entry_pass.pack(pady=(0, 15))
-        self.entry_pass.insert(0, "doc123")
+    st.markdown("<br><br><p style='text-align: center; color: #95a5a6; font-style: italic;'>DEVELOPED BY - FEYI GROUP LTD</p>", unsafe_allow_html=True)
 
-        btn_login = tk.Button(
-            login_frame,
-            text="Login",
-            bg="#2ecc71",
-            fg="white",
-            font=("Arial", 11, "bold"),
-            width=24,
-            pady=8,
-            command=self.handle_login,
-        )
-        btn_login.pack(pady=(5, 10))
+# ---------------- MAIN DASHBOARD SCREEN ----------------
+else:
+    st.markdown("<h1 style='text-align: center; color: #2c3e50;'>Hospital Management System</h1>", unsafe_allow_html=True)
+    st.markdown(f"<p style='text-align: center; color: #7f8c8d;'>Welcome, <b>{st.session_state.name}</b>!</p>", unsafe_allow_html=True)
 
-        btn_forgot = tk.Button(
-            login_frame,
-            text="Forgotten Password?",
-            bg="#ffffff",
-            fg="#2980b9",
-            font=("Arial", 9, "underline"),
-            bd=0,
-            cursor="hand2",
-            command=self.handle_forgot_password,
-        )
-        btn_forgot.pack()
+    if st.session_state.current_module == "dashboard":
+        st.markdown("<h3 style='text-align: center; color: #34495e;'>Select a section to open:</h3>", unsafe_allow_html=True)
 
-        footer_label = tk.Label(
-            self.container,
-            text="DEVELOPED BY - FEYI GROUP LTD",
-            font=("Arial", 15, "italic"),
-            bg="#f4f6f9",
-            fg="#95a5a6",
-        )
-        footer_label.pack(pady=30)
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            if st.button("🏥 Patient Registration", use_container_width=True):
+                st.session_state.current_module = "patient_registration"
+                st.rerun()
 
-    def handle_login(self):
-        username = self.entry_user.get().strip().lower()
-        password = self.entry_pass.get().strip()
+            if st.button("📅 Appointment Booking", use_container_width=True):
+                st.session_state.current_module = "appointment_booking"
+                st.rerun()
 
-        if (
-            username in self.users
-            and self.users[username]["password"] == password
-        ):
-            messagebox.showinfo(
-                "Login Success",
-                f"Welcome, {self.users[username]['name']}!",
-            )
-            self.show_main_dashboard()
-        else:
-            messagebox.showerror(
-                "Login Failed", "Invalid username or password. Please try again."
-            )
+            if st.button("🩺 Doctor Dashboard", use_container_width=True):
+                st.session_state.current_module = "doctor_dashboard"
+                st.rerun()
 
-    def handle_forgot_password(self):
-        messagebox.showinfo(
-            "Password Recovery",
-            "Password reset instructions have been sent to your registered email address.",
-        )
+            if st.button("💳 Billing & Payment", use_container_width=True):
+                st.session_state.current_module = "billing"
+                st.rerun()
 
-    def show_main_dashboard(self):
-        self.clear_container()
+            if st.button("🚪 Log Out", use_container_width=True):
+                logout()
+                st.rerun()
 
-        title_label = tk.Label(
-            self.container,
-            text="Hospital Management System",
-            font=("Arial", 18, "bold"),
-            bg="#f4f6f9",
-            fg="#2c3e50",
-        )
-        title_label.pack(pady=20)
+    else:
+        if st.button("⬅️️ Back to Main Menu"):
+            st.session_state.current_module = "dashboard"
+            st.rerun()
 
-        subtitle_label = tk.Label(
-            self.container,
-            text="Select a section to open:",
-            font=("Arial", 15),
-            bg="#f4f6f9",
-            fg="#7f8c8d",
-        )
-        subtitle_label.pack(pady=(0, 20))
+        st.markdown("---")
 
-        menu_frame = tk.Frame(self.container, bg="#ffffff", padx=20, pady=20)
-        menu_frame.pack(padx=30, pady=10, fill="both", expand=True)
+        # 1. PATIENT REGISTRATION MODULE
+        if st.session_state.current_module == "patient_registration":
+            st.subheader("🏥 Patient Registration Portal")
+            st.write("Add and manage patient records in the system.")
 
-        # Patient Registration Button (Changed to Blue)
-        btn_reg = tk.Button(
-            menu_frame,
-            text=" Patient Registration",
-            bg="#3498db",
-            fg="white",
-            font=("Arial", 11, "bold"),
-            width=32,
-            pady=10,
-            command=lambda: self.open_module("patient_registration"),
-        )
-        btn_reg.pack(pady=10)
+            with st.form("reg_form"):
+                c1, c2 = st.columns(2)
+                with c1:
+                    f_name = st.text_input("First Name")
+                    age = st.number_input("Age", min_value=0, max_value=120, value=25)
+                with c2:
+                    l_name = st.text_input("Last Name")
+                    gender = st.selectbox("Gender", ["Male", "Female", "Other"])
+                phone = st.text_input("Phone Number")
+                
+                submitted = st.form_submit_button("Register Patient")
+                if submitted:
+                    if f_name and l_name and phone:
+                        full_name = f"{f_name} {l_name}"
+                        new_id = len(st.session_state.patients) + 1
+                        st.session_state.patients.append({
+                            "id": new_id, "name": full_name, "age": age, "gender": gender, "phone": phone
+                        })
+                        st.success(f"Patient {full_name} registered successfully!")
+                    else:
+                        st.error("Please fill in First Name, Last Name, and Phone.")
 
-        # Appointment Booking Button (Blue)
-        btn_appt = tk.Button(
-            menu_frame,
-            text=" Appointment Booking",
-            bg="#3498db",
-            fg="white",
-            font=("Arial", 11, "bold"),
-            width=32,
-            pady=10,
-            command=lambda: self.open_module("appointment_booking"),
-        )
-        btn_appt.pack(pady=10)
+            st.markdown("### 📋 Registered Patients Directory")
+            if st.session_state.patients:
+                st.dataframe(st.session_state.patients, use_container_width=True)
+            else:
+                st.info("No records found.")
 
-        # Doctor Dashboard Button (Changed to Blue)
-        btn_doc = tk.Button(
-            menu_frame,
-            text=" Doctor Dashboard",
-            bg="#3498db",
-            fg="white",
-            font=("Arial", 11, "bold"),
-            width=32,
-            pady=10,
-            command=lambda: self.open_module("doctor_dashboard"),
-        )
-        btn_doc.pack(pady=10)
+        # 2. APPOINTMENT BOOKING MODULE
+        elif st.session_state.current_module == "appointment_booking":
+            st.subheader("📅 Appointment Booking Portal")
+            st.write("Schedule doctor appointments for registered patients.")
 
-        # Billing & Payment Button (Changed to Blue)
-        btn_bill = tk.Button(
-            menu_frame,
-            text=" Billing & Payment",
-            bg="#3498db",
-            fg="white",
-            font=("Arial", 11, "bold"),
-            width=32,
-            pady=10,
-            command=lambda: self.open_module("billing"),
-        )
-        btn_bill.pack(pady=10)
+            patient_names = [p["name"] for p in st.session_state.patients]
+            if not patient_names:
+                st.warning("Please register at least one patient first.")
+            else:
+                with st.form("appt_form"):
+                    sel_patient = st.selectbox("Select Patient", patient_names)
+                    sel_doctor = st.selectbox("Assign Doctor", ["Dr. Smith", "Dr. Jean Bosco", "Dr. Alice Mukamana"])
+                    appt_date = st.date_input("Appointment Date")
+                    appt_time = st.selectbox("Time Slot", ["09:00 AM", "10:30 AM", "02:00 PM", "04:00 PM"])
 
-        btn_logout = tk.Button(
-            menu_frame,
-            text="Log Out",
-            bg="#e74c3c",
-            fg="white",
-            font=("Arial", 10, "bold"),
-            width=32,
-            pady=8,
-            command=self.show_login_screen,
-        )
-        btn_logout.pack(pady=(15, 5))
+                    appt_submitted = st.form_submit_button("Confirm Booking")
+                    if appt_submitted:
+                        st.session_state.appointments.append({
+                            "patient": sel_patient,
+                            "doctor": sel_doctor,
+                            "date": str(appt_date),
+                            "time": appt_time,
+                            "status": "Confirmed"
+                        })
+                        st.success(f"Appointment scheduled for {sel_patient} with {sel_doctor}!")
 
-        footer_label = tk.Label(
-            self.container,
-            text="FEYI GROUP LTD ",
-            font=("Arial", 9, "italic"),
-            bg="#f4f6f9",
-            fg="#95a5a6",
-        )
-        footer_label.pack(pady=15)
+            st.markdown("### 📋 Scheduled Appointments")
+            if st.session_state.appointments:
+                st.dataframe(st.session_state.appointments, use_container_width=True)
+            else:
+                st.info("No scheduled appointments.")
 
-    def open_module(self, module_name):
-        """Function to launch individual sections as separate subprocesses."""
-        try:
-            subprocess.Popen([sys.executable, f"{module_name}.py"])
-        except Exception as e:
-            messagebox.showerror(
-                "Error",
-                f"Could not launch section {module_name}.\nError: {e}",
-            )
+        # 3. DOCTOR DASHBOARD MODULE
+        elif st.session_state.current_module == "doctor_dashboard":
+            st.subheader("🩺 Doctor Dashboard Portal")
+            st.write(f"Consultation workspace for **{st.session_state.name}**.")
 
+            st.markdown("### 📋 Patient Queue")
+            doc_appts = [a for a in st.session_state.appointments if a['doctor'] == st.session_state.name or st.session_state.username == 'admin']
+            if doc_appts:
+                st.dataframe(doc_appts, use_container_width=True)
+            else:
+                st.info("No active queue entries.")
 
-if __name__ == "__main__":
-    app = HospitalManagementSystem()
-    app.mainloop()
+            st.markdown("### 📝 Diagnosis & Prescription Form")
+            pat_list = [p["name"] for p in st.session_state.patients] if st.session_state.patients else []
+            if pat_list:
+                chosen_pat = st.selectbox("Select Patient", pat_list)
+                diagnosis = st.text_area("Medical Diagnosis")
+                prescription = st.text_area("Prescribed Medications & Notes")
+                if st.button("Save Medical Record"):
+                    st.success(f"Medical notes saved successfully for {chosen_pat}!")
+            else:
+                st.info("No patients available for diagnosis.")
+
+        # 4. BILLING & PAYMENT MODULE
+        elif st.session_state.current_module == "billing":
+            st.subheader("💳 Billing & Payment Portal")
+            st.write("Generate bills and check payment processing statuses.")
+
+            pat_list = [p["name"] for p in st.session_state.patients]
+            if not pat_list:
+                st.warning("No patients available for billing.")
+            else:
+                with st.form("bill_form"):
+                    b_patient = st.selectbox("Select Patient", pat_list)
+                    service = st.selectbox("Service Type", ["Consultation Fee", "Laboratory Tests", "Pharmacy / Medication", "Ward Admission"])
+                    amount = st.number_input("Amount (RWF)", min_value=0, value=10000, step=1000)
+                    status = st.selectbox("Payment Status", ["Paid", "Pending"])
+
+                    bill_submitted = st.form_submit_button("Generate Bill")
+                    if bill_submitted:
+                        st.session_state.bills.append({
+                            "patient": b_patient,
+                            "service": service,
+                            "amount": amount,
+                            "status": status
+                        })
+                        st.success(f"Bill for {b_patient} amounting to {amount:,} RWF added successfully!")
+
+            st.markdown("### 📋 Financial Records & Invoices")
+            if st.session_state.bills:
+                st.dataframe(st.session_state.bills, use_container_width=True)
+            else:
+                st.info("No billing records found.")
+
+    st.markdown("<br><br><p style='text-align: center; color: #95a5a6; font-style: italic;'>FEYI GROUP LTD</p>", unsafe_allow_html=True)
