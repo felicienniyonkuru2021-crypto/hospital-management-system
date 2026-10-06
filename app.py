@@ -1,8 +1,8 @@
 import streamlit as st
 
-# Configure page settings (page icon removed)
+# Configure page settings
 st.set_page_config(
-    page_title="Hospital Management System - Portal", layout="centered"
+    page_title="Hospital Management System - Portal", page_icon="🏥", layout="centered"
 )
 
 # Custom CSS to force clean white background, dark text, blue buttons, and green Log Out button
@@ -267,4 +267,15 @@ else:
                         st.session_state.bills.append({
                             "patient": b_patient,
                             "service": service,
-                            "
+                            "amount": amount,
+                            "status": status
+                        })
+                        st.success(f"Bill for {b_patient} amounting to {amount:,} RWF added successfully!")
+
+            st.markdown("### 📋 Financial Records & Invoices")
+            if st.session_state.bills:
+                st.dataframe(st.session_state.bills, use_container_width=True)
+            else:
+                st.info("No billing records found.")
+
+    st.markdown("<br><br><p style='text-align: center; color: #95a5a6; font-style: italic;'>FEYI GROUP LTD</p>", unsafe_allow_html=True)
