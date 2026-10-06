@@ -5,7 +5,7 @@ st.set_page_config(
     page_title="Hospital Management System - Portal", page_icon="🏥", layout="centered"
 )
 
-# Custom CSS to force clean white background, dark text, and blue buttons/inputs
+# Custom CSS to force clean white background, dark text, blue buttons, and green Log Out button
 st.markdown(
     """
     <style>
@@ -17,7 +17,7 @@ st.markdown(
         color: #2c3e50 !important;
         font-weight: bold;
     }
-    /* Style all buttons (regular and form submit buttons) to be blue with white text */
+    /* Style all regular and form submit buttons to be blue with white text by default */
     div.stButton > button, div.stFormSubmitButton > button {
         background-color: #3498db !important;
         color: white !important;
@@ -28,6 +28,13 @@ st.markdown(
     div.stButton > button:hover, div.stFormSubmitButton > button:hover {
         background-color: #2980b9 !important;
         color: white !important;
+    }
+    /* Style the Log Out button specifically to be green */
+    div.stButton > button:has(p:contains("Log Out")), div.stButton > button:has(div:contains("Log Out")) {
+        background-color: #2ecc71 !important;
+    }
+    div.stButton > button:has(p:contains("Log Out")):hover, div.stButton > button:has(div:contains("Log Out")):hover {
+        background-color: #27ae60 !important;
     }
     /* Force light background and blue border for input fields */
     input, textarea, select {
